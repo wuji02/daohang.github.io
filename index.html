@@ -27,9 +27,7 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
     }
 
-    body {
-      color: #fff;
-    }
+    body { color: #fff; }
 
     .activity-page {
       position: relative;
@@ -136,20 +134,19 @@
 
   <script>
     const copyText = "￥tX4sgazm3tz￥/ HU7405";
-    const taobaoWebUrl = "https://market.m.taobao.com/app/starlink/wakeup-transit/pages/download?star_id=9249&slk_force_set_request=true&scene=7c3f6591706c4a5fa8bc6301abfc4a9d";
-    const taobaoAppUrl = "tbopen://m.taobao.com/tbopen/index.html?&action=ali.open.nav&module=h5&h5Url=https%3A%2F%2Ftb.ele.me%2Fwow%2Fz%2Funiapp%2F1100497%2Fad-miniapp%2Fet-union%2Fhome%3Fwh_weex%3Dtrue%26weex_mode%3Ddom%26channelInfo%3D%257B%2522subSubChannel%2522%253A%2522miniapp.taobao.et%2522%257D%26alsc_exsrc%3DES0007485972%26o2i_1st_clk%3D__CLICK_ID__%26tfPos%3Dh5%26scene%3D7c3f6591706c4a5fa8bc6301abfc4a9d";
+    const taobaoSchemeUrl = "tbopen://m.taobao.com/tbopen/index.html?&action=ali.open.nav&module=h5&h5Url=https%3A%2F%2Ftb.ele.me%2Fwow%2Fz%2Funiapp%2F1100497%2Fad-miniapp%2Fet-union%2Fhome%3Fwh_weex%3Dtrue%26weex_mode%3Ddom%26channelInfo%3D%257B%2522subSubChannel%2522%253A%2522miniapp.taobao.et%2522%257D%26alsc_exsrc%3DES0007485972%26o2i_1st_clk%3D__CLICK_ID__%26tfPos%3Dh5%26scene%3D7c3f6591706c4a5fa8bc6301abfc4a9d";
+    const taobaoFallbackUrl = "https://market.m.taobao.com/app/starlink/wakeup-transit/pages/download?star_id=9249&slk_force_set_request=true&scene=7c3f6591706c4a5fa8bc6301abfc4a9d";
+    const taobaoWakeUrl = "https://ace.tb.cn/t?smburl=" + encodeURIComponent(taobaoSchemeUrl) + "&redirectUrl=https%3A%2F%2Fmarket.m.taobao.com%2Fapp%2Fstarlink%2Fcore%2FdownloadTaobao.html";
     const button = document.getElementById("copyButton");
     const toast = document.getElementById("toast");
-    const userAgent = navigator.userAgent;
-    const isWechat = /MicroMessenger/i.test(userAgent);
-    const isIOS = /iPhone|iPad|iPod/i.test(userAgent);
+    const isMobile = /Android|iPhone|iPad|iPod|MicroMessenger/i.test(navigator.userAgent);
     let timer;
 
     function showToast(message) {
       toast.textContent = message;
       toast.classList.add("show");
       window.clearTimeout(timer);
-      timer = window.setTimeout(() => toast.classList.remove("show"), 1600);
+      timer = window.setTimeout(() => toast.classList.remove("show"), 1200);
     }
 
     function copyToClipboard(text) {
@@ -162,7 +159,6 @@
       document.body.appendChild(textarea);
       textarea.select();
       textarea.setSelectionRange(0, textarea.value.length);
-
       const copied = document.execCommand("copy");
       document.body.removeChild(textarea);
 
@@ -172,30 +168,13 @@
     }
 
     function openTaobao() {
-      if (isWechat || isIOS) {
-        window.location.href = taobaoWebUrl;
-        return;
-      }
-
-      const fallback = window.setTimeout(() => {
-        if (document.visibilityState === "visible") {
-          window.location.href = taobaoWebUrl;
-        }
-      }, 1300);
-
-      document.addEventListener("visibilitychange", () => {
-        if (document.visibilityState === "hidden") {
-          window.clearTimeout(fallback);
-        }
-      }, { once: true });
-
-      window.location.href = taobaoAppUrl;
+      window.location.href = isMobile ? taobaoWakeUrl : taobaoFallbackUrl;
     }
 
     button.addEventListener("click", () => {
       copyToClipboard(copyText);
       showToast("口令已复制，正在打开淘宝");
-      openTaobao();
+      window.setTimeout(openTaobao, 500);
     });
   </script>
 </body>
