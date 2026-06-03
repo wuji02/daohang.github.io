@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, minimum-scale=1, maximum-scale=1, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="format-detection" content="telephone=no,address=no,email=no">
+  <title>闪购品牌日 单单有福利</title>
+  <style>
+    :root {
+      --page-bg: #f6f7f9;
+      --button-start: #fb251b;
+      --button-end: #ff6a00;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html,
+    body {
+      width: 100%;
+      min-height: 100%;
+      margin: 0;
+      background: var(--page-bg);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+    }
+
+    body {
+      color: #fff;
+    }
+
+    .activity-page {
+      position: relative;
+      width: 100%;
+      min-height: 100vh;
+      margin: 0 auto;
+      overflow: hidden;
+      background: var(--page-bg);
+    }
+
+    .page-background img {
+      display: block;
+      width: 100%;
+      object-fit: contain;
+      user-select: none;
+      pointer-events: none;
+    }
+
+    .button-box {
+      position: fixed;
+      left: 50%;
+      bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+      width: 80vw;
+      max-width: 340px;
+      height: 52px;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      border: 0;
+      padding: 0;
+      background: transparent;
+      cursor: pointer;
+    }
+
+    .button-anim {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50px;
+      background: linear-gradient(135deg, var(--button-start), var(--button-end));
+      color: #fff;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0;
+      text-align: center;
+      box-shadow: 0 7px 18px rgba(255, 67, 20, .18);
+      animation: scale 1s ease-in-out infinite;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: calc(150px + env(safe-area-inset-bottom, 0px));
+      width: max-content;
+      max-width: calc(100vw - 32px);
+      transform: translate(-50%, 12px);
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, .72);
+      color: #fff;
+      font-size: 13px;
+      line-height: 1.3;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s ease, transform .2s ease;
+      z-index: 3;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+
+    @keyframes scale {
+      0%,
+      100% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.1);
+      }
+    }
+
+    @media (max-width: 340px) {
+      .button-anim {
+        font-size: 14px;
+      }
+    }
+
+    @media (min-width: 768px) {
+      .activity-page {
+        max-width: 430px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="activity-page">
+    <div class="page-background" aria-hidden="true">
+      <img src="https://ossupload.xj1888.cn/xuanjun/upload/20260109/696070c8bae2c.jpg" alt="">
+    </div>
+
+    <button class="button-box" type="button" id="copyButton" aria-label="复制口令打开淘宝领红包">
+      <span class="button-anim">复制口令打开淘宝领红包</span>
+    </button>
+
+    <div class="toast" id="toast" role="status" aria-live="polite">口令已复制</div>
+  </main>
+
+  <script>
+    const copyText = "￥tX4sgazm3tz￥/ HU7405";
+    const taobaoWebUrl = "https://market.m.taobao.com/app/starlink/wakeup-transit/pages/download?star_id=9249&slk_force_set_request=true&scene=7c3f6591706c4a5fa8bc6301abfc4a9d";
+    const taobaoAppUrl = "tbopen://m.taobao.com/tbopen/index.html?&action=ali.open.nav&module=h5&h5Url=https%3A%2F%2Ftb.ele.me%2Fwow%2Fz%2Funiapp%2F1100497%2Fad-miniapp%2Fet-union%2Fhome%3Fwh_weex%3Dtrue%26weex_mode%3Ddom%26channelInfo%3D%257B%2522subSubChannel%2522%253A%2522miniapp.taobao.et%2522%257D%26alsc_exsrc%3DES0007485972%26o2i_1st_clk%3D__CLICK_ID__%26tfPos%3Dh5%26scene%3D7c3f6591706c4a5fa8bc6301abfc4a9d";
+    const button = document.getElementById("copyButton");
+    const toast = document.getElementById("toast");
+    let timer;
+
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add("show");
+      window.clearTimeout(timer);
+      timer = window.setTimeout(() => toast.classList.remove("show"), 1600);
+    }
+
+    async function copyToClipboard(text) {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+        return;
+      }
+
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.setAttribute("readonly", "");
+      textarea.style.position = "fixed";
+      textarea.style.left = "-9999px";
+      textarea.style.top = "0";
+      document.body.appendChild(textarea);
+      textarea.select();
+
+      const copied = document.execCommand("copy");
+      document.body.removeChild(textarea);
+
+      if (!copied) {
+        throw new Error("Copy command failed");
+      }
+    }
+
+    function openTaobao() {
+      const fallback = window.setTimeout(() => {
+        if (document.visibilityState === "visible") {
+          window.location.href = taobaoWebUrl;
+        }
+      }, 1300);
+
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "hidden") {
+          window.clearTimeout(fallback);
+        }
+      }, { once: true });
+
+      window.location.href = taobaoAppUrl;
+    }
+
+    button.addEventListener("click", async () => {
+      try {
+        await copyToClipboard(copyText);
+        showToast("口令已复制，正在打开淘宝");
+      } catch {
+        showToast("正在打开淘宝");
+      }
+
+      window.setTimeout(openTaobao, 120);
+    });
+  </script>
+</body>
+</html>
