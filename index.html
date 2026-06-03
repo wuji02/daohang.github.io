@@ -108,26 +108,16 @@
     }
 
     @keyframes scale {
-      0%,
-      100% {
-        transform: scale(1);
-      }
-
-      50% {
-        transform: scale(1.1);
-      }
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
     }
 
     @media (max-width: 340px) {
-      .button-anim {
-        font-size: 14px;
-      }
+      .button-anim { font-size: 14px; }
     }
 
     @media (min-width: 768px) {
-      .activity-page {
-        max-width: 430px;
-      }
+      .activity-page { max-width: 430px; }
     }
   </style>
 </head>
@@ -150,6 +140,9 @@
     const taobaoAppUrl = "tbopen://m.taobao.com/tbopen/index.html?&action=ali.open.nav&module=h5&h5Url=https%3A%2F%2Ftb.ele.me%2Fwow%2Fz%2Funiapp%2F1100497%2Fad-miniapp%2Fet-union%2Fhome%3Fwh_weex%3Dtrue%26weex_mode%3Ddom%26channelInfo%3D%257B%2522subSubChannel%2522%253A%2522miniapp.taobao.et%2522%257D%26alsc_exsrc%3DES0007485972%26o2i_1st_clk%3D__CLICK_ID__%26tfPos%3Dh5%26scene%3D7c3f6591706c4a5fa8bc6301abfc4a9d";
     const button = document.getElementById("copyButton");
     const toast = document.getElementById("toast");
+    const userAgent = navigator.userAgent;
+    const isWechat = /MicroMessenger/i.test(userAgent);
+    const isIOS = /iPhone|iPad|iPod/i.test(userAgent);
     let timer;
 
     function showToast(message) {
@@ -159,12 +152,7 @@
       timer = window.setTimeout(() => toast.classList.remove("show"), 1600);
     }
 
-    async function copyToClipboard(text) {
-      if (navigator.clipboard && window.isSecureContext) {
-        await navigator.clipboard.writeText(text);
-        return;
-      }
-
+    function copyToClipboard(text) {
       const textarea = document.createElement("textarea");
       textarea.value = text;
       textarea.setAttribute("readonly", "");
@@ -173,16 +161,22 @@
       textarea.style.top = "0";
       document.body.appendChild(textarea);
       textarea.select();
+      textarea.setSelectionRange(0, textarea.value.length);
 
       const copied = document.execCommand("copy");
       document.body.removeChild(textarea);
 
-      if (!copied) {
-        throw new Error("Copy command failed");
+      if (!copied && navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).catch(() => {});
       }
     }
 
     function openTaobao() {
+      if (isWechat || isIOS) {
+        window.location.href = taobaoWebUrl;
+        return;
+      }
+
       const fallback = window.setTimeout(() => {
         if (document.visibilityState === "visible") {
           window.location.href = taobaoWebUrl;
@@ -198,15 +192,10 @@
       window.location.href = taobaoAppUrl;
     }
 
-    button.addEventListener("click", async () => {
-      try {
-        await copyToClipboard(copyText);
-        showToast("口令已复制，正在打开淘宝");
-      } catch {
-        showToast("正在打开淘宝");
-      }
-
-      window.setTimeout(openTaobao, 120);
+    button.addEventListener("click", () => {
+      copyToClipboard(copyText);
+      showToast("口令已复制，正在打开淘宝");
+      openTaobao();
     });
   </script>
 </body>
